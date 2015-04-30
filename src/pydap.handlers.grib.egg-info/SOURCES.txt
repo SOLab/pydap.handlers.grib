@@ -1,0 +1,12 @@
+setup.py
+src/pydap/__init__.py
+src/pydap.handlers.grib.egg-info/PKG-INFO
+src/pydap.handlers.grib.egg-info/SOURCES.txt
+src/pydap.handlers.grib.egg-info/dependency_links.txt
+src/pydap.handlers.grib.egg-info/entry_points.txt
+src/pydap.handlers.grib.egg-info/namespace_packages.txt
+src/pydap.handlers.grib.egg-info/not-zip-safe
+src/pydap.handlers.grib.egg-info/requires.txt
+src/pydap.handlers.grib.egg-info/top_level.txt
+src/pydap/handlers/__init__.py
+src/pydap/handlers/grib/__init__.py

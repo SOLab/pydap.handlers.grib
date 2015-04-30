@@ -1,0 +1,4 @@
+Pydap
+ConfigObj
+pupynere
+Numpy

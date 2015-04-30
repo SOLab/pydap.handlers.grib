@@ -1,0 +1,11 @@
+Metadata-Version: 1.0
+Name: pydap.handlers.grib
+Version: 0.1
+Summary: Handler for that allows Pydap to serve grib data
+Home-page: https://github.com/SOLab/pydap.handlers.grib
+Author: Denis Spiridonov
+Author-email: sdi@rshu.ru
+License: MIT
+Description: UNKNOWN
+Keywords: netcdf opendap dods dap science
+Platform: UNKNOWN
