@@ -1,4 +1,0 @@
-
-        [pydap.handler]
-        grib = pydap.handlers.grib:GribHandler
-    
