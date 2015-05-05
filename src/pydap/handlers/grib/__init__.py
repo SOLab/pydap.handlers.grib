@@ -120,55 +120,31 @@ class GribHandler(BaseHandler):
         if projection:
             for var in projection:
                 var_name = var[len(var)-1][0]
-                slices = var[len(var)-1][1]
                 if var_name in list_of_var:
                     continue
                 list_of_var.append(var_name)
                 if var_name in ['lat', 'lon']:
                     if var_name == 'lon':
-                        if len(slices):
-                            lon_slice = slices[0]
-                        else:
-                            lon_slice = slice(0, self._shape[1])
-
-                        print 'lon_slice = ', lon_slice
-                        data = self.lons[lon_slice]
                         dataset[var_name] = BaseType(name=var_name,
-                                                     data=data,
-                                                     shape=data.shape,
-                                                     type=data.dtype.char)
+                                                     data=self.lons,
+                                                     shape=self.lons.shape,
+                                                     type=self.lons.dtype.char)
                     elif var_name == 'lat':
-                        if len(slices):
-                            lat_slice = slices[0]
-                        else:
-                            lat_slice = slice(0, self._shape[0])
-                        data = self.lats[lat_slice]
                         dataset[var_name] = BaseType(name=var_name,
-                                                     data=data,
-                                                     shape=data.shape,
-                                                     type=data.dtype.char)
+                                                     data=self.lats,
+                                                     shape=self.lats.shape,
+                                                     type=self.lats.dtype.char)
                 else:
                     for variable in self.variables:
                         if variable.name == var_name:
-                            if len(slices) != 2:
-                                slices = [slice(0, self._shape[0]), slice(0, self._shape[1])]
-                                # raise ValueError('Cannot obtain slices for %s. '
-                                #                  'Should be 3 slices, but %d found' % (var_name, len(slices)))
-                            print 'retrieving %s' % var_name, slices
+                            self.dataset[variable.name]['lat'].data = self.lats
+                            self.dataset[variable.name]['lon'].data = self.lons
 
-                            if slices:
-                                self.dataset[variable.name]['lat'].data = self.lats[slices[0]]
-                                self.dataset[variable.name]['lon'].data = self.lons[slices[1]]
-                            else:
-                                self.dataset[variable.name]['lat'].data = self.lats
-                                self.dataset[variable.name]['lon'].data = self.lons
-
-                            data = self.get_data_for_parameter(var_name, slices)
+                            data = self.get_data_for_parameter(var_name, None)
                             dataset[var_name] = BaseType(name=var_name,
                                                          data=data,
                                                          shape=data.shape,
                                                          type=data.dtype.char)
-                            # self.dataset[var_name].data = self.get_data_for_parameter(var_name, slices)
                             break
 
         return constrain(dataset, environ.get('QUERY_STRING', ''))
