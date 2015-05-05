@@ -67,11 +67,11 @@ class GribHandler(BaseHandler):
             dimensions=('lon',),
             type=Float32,
             attributes=({
-                'long_name' : 'longitude',
+                'long_name': 'longitude',
                 # 'add_offset' : 0,
                 # 'scale_factor' : 1,
-                'valid_range' : '-180, 180',
-                'units' : 'degrees_east'
+                'valid_range': '-180, 180',
+                'units': 'degrees_east'
             })
         )
 
@@ -82,11 +82,11 @@ class GribHandler(BaseHandler):
             dimensions=('lat',),
             type=Float32,
             attributes=({
-                'long_name' : 'latitude',
+                'long_name': 'latitude',
                 # 'add_offset' : 0,
                 # 'scale_factor' : 1,
-                'valid_range' : '-90, 90',
-                'units' : 'degrees_north'
+                'valid_range': '-90, 90',
+                'units': 'degrees_north'
             })
         )
 
@@ -128,22 +128,22 @@ class GribHandler(BaseHandler):
                         dataset[var_name] = BaseType(name=var_name,
                                                      data=self.lons,
                                                      shape=self.lons.shape,
+                                                     dimensions=('lon',),
                                                      type=self.lons.dtype.char)
                     elif var_name == 'lat':
                         dataset[var_name] = BaseType(name=var_name,
                                                      data=self.lats,
                                                      shape=self.lats.shape,
+                                                     dimensions=('lat',),
                                                      type=self.lats.dtype.char)
                 else:
                     for variable in self.variables:
                         if variable.name == var_name:
-                            self.dataset[variable.name]['lat'].data = self.lats
-                            self.dataset[variable.name]['lon'].data = self.lons
-
                             data = self.get_data_for_parameter(var_name, None)
                             dataset[var_name] = BaseType(name=var_name,
                                                          data=data,
                                                          shape=data.shape,
+                                                         dimensions=('lat', 'lon'),
                                                          type=data.dtype.char)
                             break
 
