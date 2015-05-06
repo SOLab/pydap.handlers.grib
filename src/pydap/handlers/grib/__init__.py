@@ -70,7 +70,7 @@ class GribHandler(BaseHandler):
                 'long_name': 'longitude',
                 # 'add_offset' : 0,
                 # 'scale_factor' : 1,
-                'valid_range': '-180, 180',
+                'valid_range': '0, 359',
                 'units': 'degrees_east'
             })
         )
@@ -94,12 +94,9 @@ class GribHandler(BaseHandler):
         self.dataset['lat'] = latVar
 
         for variable in self.variables:
-            # print variable.name
             g = GridType(name=variable.name)
             g[variable.name] = variable
 
-            g['lon'] = lonVar.__deepcopy__()
-            g['lat'] = latVar.__deepcopy__()
             g.attributes = variable.attributes
 
             self.dataset[variable.name] = g
@@ -126,25 +123,22 @@ class GribHandler(BaseHandler):
                 if var_name in ['lat', 'lon']:
                     if var_name == 'lon':
                         dataset[var_name] = BaseType(name=var_name,
-                                                     data=self.lons,
-                                                     shape=self.lons.shape,
-                                                     dimensions=('lon',),
-                                                     type=self.lons.dtype.char)
+                                                  data=self.lons,
+                                                  shape=self.lons.shape,
+                                                  dimensions=('lon',),
+                                                  type=self.lons.dtype.char)
                     elif var_name == 'lat':
                         dataset[var_name] = BaseType(name=var_name,
-                                                     data=self.lats,
-                                                     shape=self.lats.shape,
-                                                     dimensions=('lat',),
-                                                     type=self.lats.dtype.char)
+                                                  data=self.lats,
+                                                  shape=self.lats.shape,
+                                                  dimensions=('lat',),
+                                                  type=self.lats.dtype.char)
                 else:
-                    for variable in self.variables:
-                        if variable.name == var_name:
-                            data = self.get_data_for_parameter(var_name, None)
-                            dataset[var_name] = BaseType(name=var_name,
-                                                         data=data,
-                                                         shape=data.shape,
-                                                         dimensions=('lat', 'lon'),
-                                                         type=data.dtype.char)
-                            break
+                    data = self.get_data_for_parameter(var_name, None)
+                    dataset[var_name] = BaseType(name=var_name,
+                                                 data=data,
+                                                 shape=data.shape,
+                                                 dimensions=('lat', 'lon'),
+                                                 type=data.dtype.char)
 
         return constrain(dataset, environ.get('QUERY_STRING', ''))
