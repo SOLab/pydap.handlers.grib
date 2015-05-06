@@ -12,6 +12,7 @@ install_requires = [
     'ConfigObj',
     'pupynere',
     'Numpy',
+    'pygrib',
 ]
 
 
