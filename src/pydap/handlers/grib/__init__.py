@@ -1,7 +1,8 @@
 """A Pydap handler for grib files."""
-
 import os
 import re
+
+import ipdb
 
 import gzip
 
@@ -15,6 +16,7 @@ import numpy as np
 import struct
 import copy
 import pygrib
+
 
 def replace_name(pp_name):
     pp_name = str(pp_name)
@@ -35,7 +37,6 @@ class GribHandler(BaseHandler):
                 "granule_name": self.filename,
             }
         })
-
 
         msg1 = self.grib.message(1)
         self._shape = msg1.data()[0].shape
@@ -109,7 +110,17 @@ class GribHandler(BaseHandler):
                 else:
                     return self.grib.message(i+1).data()[0]
 
+    def parse_values(self, ce):
+        lvar = []
+        for i in ce:
+            if '=' in i:
+                name, val = i.split('=')
+                if name == "layer":
+                    lvar = val.split(',')
+        return lvar
+
     def parse_constraints(self, environ):
+        # ipdb.set_trace()
         dataset = copy.deepcopy(self.dataset)
 
         projection, selection = parse_qs(environ.get('QUERY_STRING', ''))
@@ -140,5 +151,34 @@ class GribHandler(BaseHandler):
                                                  shape=data.shape,
                                                  dimensions=('lat', 'lon'),
                                                  type=data.dtype.char)
+        elif selection:
+            lvar = self.parse_values(selection)
+            if lvar:
+                lvar.extend(['lat', 'lon'])
+                for var in lvar:
+                    var_name = var
+                    if var_name in list_of_var:
+                        continue
+                    list_of_var.append(var_name)
+                    if var_name in ['lat', 'lon']:
+                        if var_name == 'lon':
+                            dataset[var_name] = BaseType(name=var_name,
+                                                      data=self.lons,
+                                                      shape=self.lons.shape,
+                                                      dimensions=('lon',),
+                                                      type=self.lons.dtype.char)
+                        elif var_name == 'lat':
+                            dataset[var_name] = BaseType(name=var_name,
+                                                      data=self.lats,
+                                                      shape=self.lats.shape,
+                                                      dimensions=('lat',),
+                                                      type=self.lats.dtype.char)
+                    else:
+                        data = self.get_data_for_parameter(var_name, None)
+                        dataset[var_name] = BaseType(name=var_name,
+                                                     data=data,
+                                                     shape=data.shape,
+                                                     dimensions=('lat', 'lon'),
+                                                     type=data.dtype.char)
 
         return constrain(dataset, environ.get('QUERY_STRING', ''))
