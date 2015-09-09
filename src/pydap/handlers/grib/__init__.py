@@ -18,7 +18,7 @@ import pygrib
 
 def replace_name(pp_name):
     pp_name = str(pp_name)
-    for ch in ': ()*%-':
+    for ch in ': ()*%-[]':
         pp_name = pp_name.replace(ch, '_')
     return pp_name
 
@@ -36,7 +36,6 @@ class GribHandler(BaseHandler):
             }
         })
 
-
         msg1 = self.grib.message(1)
         self._shape = msg1.data()[0].shape
         _dim = ('lat', 'lon')
@@ -47,18 +46,22 @@ class GribHandler(BaseHandler):
 
         self.variables = []
         for i in range(self.grib.messages):
-            pp_name = replace_name(self.grib.message(i+1))
+            msg = self.grib.message(i+1)
+            pp_name = replace_name(msg)
+            short_name = replace_name("%d %s" % (i+1, msg['parameterName']))
 
             self.variables.append(
                 BaseType(
-                    name=str(pp_name),
+                    name=str(short_name),
                     data=None,
                     shape=self._shape,
                     dimensions=_dim,
                     type=_type,
                     attributes={
+                        'long_name': str(pp_name)
                     }
                 ))
+            del msg
 
         lonVar = BaseType(
             name='lon',
@@ -101,9 +104,9 @@ class GribHandler(BaseHandler):
 
             self.dataset[variable.name] = g
 
-    def get_data_for_parameter(self, pp_name, slices):
+    def get_data_for_parameter(self, short_name, slices):
         for i in range(self.grib.messages):
-            if replace_name(self.grib.message(i+1)) == pp_name:
+            if replace_name("%d %s" % (i+1, self.grib.message(i+1)['parameterName'])) == short_name:
                 if slices:
                     return self.grib.message(i+1).data()[0][slices]
                 else:
